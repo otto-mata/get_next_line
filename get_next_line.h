@@ -6,7 +6,7 @@
 /*   By: tblochet <tblochet@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/09 11:58:21 by tblochet          #+#    #+#             */
-/*   Updated: 2024/11/09 20:29:39 by tblochet         ###   ########.fr       */
+/*   Updated: 2024/11/13 18:34:38 by tblochet         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,12 +21,11 @@
 #  define BUFFER_SIZE 42
 # endif
 
-typedef struct s_params {
+typedef struct s_buffer {
+	char	*s;
 	int		state;
-	int		i;
-	char	*buf;
-	size_t	last_sz;
-}				t_params;
+	int		empty;
+}				t_buffer;
 
 char	*get_next_line(int fd);
 ssize_t	ft_index_of(char const *s, char c);
@@ -34,5 +33,5 @@ char	*ft_strjoin(char const *s1, char const *s2);
 size_t	ft_strlen(char const *s);
 char	*ft_roll_left(char **s, size_t i);
 char	*ft_strndup(char *s, size_t n);
-
+void	*ft_calloc(size_t nmemb, size_t sz);
 #endif

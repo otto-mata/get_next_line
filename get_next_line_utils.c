@@ -6,11 +6,36 @@
 /*   By: tblochet <tblochet@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/09 11:58:27 by tblochet          #+#    #+#             */
-/*   Updated: 2024/11/09 20:29:16 by tblochet         ###   ########.fr       */
+/*   Updated: 2024/11/13 14:41:52 by tblochet         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
+
+void	ft_bzero(void *mem, size_t sz)
+{
+	while (sz--)
+		*(unsigned char *)mem++ = 0;
+}
+
+void	*ft_calloc(size_t nmemb, size_t sz)
+{
+	void	*ptr;
+	size_t	msz;
+
+	msz = nmemb * sz;
+	if (nmemb == 0 || sz == 0)
+	{
+		nmemb = 1;
+		sz = 1;
+	}
+	if ((int)nmemb < 0 || (int)sz < 0)
+		return (0);
+	ptr = malloc(msz);
+	if (ptr)
+		ft_bzero(ptr, msz);
+	return (ptr);
+}
 
 ssize_t	ft_index_of(char const *s, char c)
 {
@@ -43,7 +68,7 @@ char	*ft_strndup(char *s, size_t n)
 
 	if (!s)
 		return (0);
-	str = malloc(sizeof(char) * (ft_strlen(s) + 1));
+	str = ft_calloc((ft_strlen(s) + 1), sizeof(char));
 	if (!str)
 		return (0);
 	i = 0;
@@ -52,7 +77,6 @@ char	*ft_strndup(char *s, size_t n)
 		str[i] = s[i];
 		i++;
 	}
-	str[i] = '\0';
 	return (str);
 }
 
@@ -63,7 +87,7 @@ char	*ft_roll_left(char **s, size_t i)
 	char			*s2;
 
 	ret = ft_strndup(*s, i);
-	s2 = ft_strndup(&(s[0][i + 1]), sz);
+	s2 = ft_strndup(&(*s[i + 1]), sz);
 	if (!s2)
 		s2 = 0;
 	free(*s);
@@ -78,7 +102,7 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	char			*s;
 	size_t			i;
 
-	s = malloc(sz * sizeof(char));
+	s = ft_calloc(sz, sizeof(char));
 	if (!s)
 		return (0);
 	i = 0;
@@ -92,6 +116,5 @@ char	*ft_strjoin(char const *s1, char const *s2)
 		s[i] = s2[i - s1sz];
 		i++;
 	}
-	s[i] = 0;
 	return (s);
 }

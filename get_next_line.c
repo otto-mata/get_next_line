@@ -6,97 +6,119 @@
 /*   By: tblochet <tblochet@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/09 11:58:24 by tblochet          #+#    #+#             */
-/*   Updated: 2024/11/09 21:24:39 by tblochet         ###   ########.fr       */
+/*   Updated: 2024/11/13 20:32:05 by tblochet         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 #include <stdio.h>
 
-int	ft_read_wrapper(int fd, char **b)
+char	*ft_append(char *dst, char const *src)
 {
-	int		i;
-	char	*buf;
-	char	*tmp;
+	char	*dup;
 
-	buf = malloc((BUFFER_SIZE + 1) * sizeof(char));
-	if (!buf)
-		return (-1);
-	i = read(fd, buf, BUFFER_SIZE);
-	tmp = ft_strndup(*b, ft_strlen(*b));
-	free(*b);
-	buf[i] = 0;
-	if (i > 0)
-		*b = ft_strjoin(tmp, buf);
-	else
-		*b = ft_strndup(tmp, ft_strlen(tmp));
-	free(tmp);
-	free(buf);
-	return (i);
+	dup = ft_strndup(dst, ft_strlen((const char *)dst));
+	free(dst);
+	dst = ft_strjoin(dup, src);
+	free(dup);
+	return (dst);
+}
+
+char	*ft_extract_line(t_buffer *buff)
+{
+	size_t	ix;
+	char	*dup;
+	char	*dup2;
+
+	ix = (size_t)ft_index_of(buff->s, '\n');
+	dup = ft_strndup(buff->s, ft_strlen(buff->s));
+	free(buff->s);
+	if (ix == ft_strlen(dup) - 1)
+	{
+		buff->s = ft_calloc(1, sizeof(char));
+		return (dup);
+	}
+	dup2 = ft_strndup(dup, ix);
+	buff->s = ft_strndup(dup + ix + 1, ft_strlen(dup) - ix + 1);
+	free(dup);
+	buff->empty = (buff->s[0] == 0);
+	return (dup2);
+}
+
+void	ft_populate_tmp(char *tmp)
+{
+	size_t	i;
+
+	i = 0;
+	while (i < BUFFER_SIZE + 1)
+	{
+		tmp[i] = 0;
+		i++;
+	}
+}
+
+char	*ft_return_end_empty_buffer(char **buffer)
+{
+	char	*dup;
+	
+	if (*buffer == 0)
+		return (0);
+	dup = ft_strndup(*buffer, ft_strlen(*buffer));
+	free(*buffer);
+	*buffer = 0;
+	return (dup);
 }
 
 char	*get_next_line(int fd)
 {
-	ssize_t			idx;
-	static t_params	b;
-	char			*ret;
+	static t_buffer	buff;
+	char			tmp[BUFFER_SIZE + 1];
+	ssize_t			rx;
 
-	if (b.state == 2)
+	ft_populate_tmp(tmp);
+	rx = read(fd, tmp, BUFFER_SIZE);
+	if (rx < 0)
 		return (0);
-	if (!b.state)
+	if (!buff.state)
 	{
-		b.buf = malloc((BUFFER_SIZE + 1) * sizeof(char));
-		if (!b.buf)
-			return (0);
-		b.state = 1;
-		b.i = 1;
+		buff.state = 1;
+		buff.s = ft_calloc(BUFFER_SIZE + 1, sizeof(char));
 	}
-	idx = ft_index_of(b.buf, '\n');
-	while (b.i > 0 && idx < 0)
+	while (rx)
 	{
-		b.i = ft_read_wrapper(fd, &b.buf);
-		idx = ft_index_of(b.buf, '\n');
+		buff.s = ft_append(buff.s, tmp);
+		if (ft_index_of(buff.s, '\n') > -1)
+			return (ft_extract_line(&buff));
+		rx = read(fd, tmp, BUFFER_SIZE);
 	}
-	if (b.i == -1
-		|| (b.i == 0
-			&& (ft_strlen(b.buf) + 1 == b.last_sz
-				|| b.state == 1)))
-	{
-		free(b.buf);
-		b.buf = 0;
-		b.state = 2;
-		return (0);
-	}
-	if (idx < 0)
-		idx = ft_strlen(b.buf);
-	ret = ft_roll_left(&b.buf, idx);
-	b.last_sz = ft_strlen(ret);
-	return (ret);
+	return (ft_return_end_empty_buffer(&buff.s));
 }
 
-// int	main(void)
+// int	main(int ac, char **av)
 // {
 // 	int		fd;
 // 	char	*s;
 
-// 	fd = open("file.txt", O_RDONLY);
+// 	if (ac < 2)
+// 		return ((int)printf("No file provided.\n"));
+// 	fd = open(av[1], O_RDONLY);
 // 	s = get_next_line(fd);
+// 	printf("1. %s", s);
+// 	free(s);
+// 	s = get_next_line(fd);
+// 	printf("2. %s", s);
+// 	free(s);
+// 	s = get_next_line(fd);
+// 	printf("3. %s", s);
+// 	free(s);
+// 	s = get_next_line(fd);
+// 	printf("4. %s", s);
+// 	free(s);
+// 	/* s = get_next_line(fd);
 // 	printf("%s", s);
 // 	free(s);
 // 	s = get_next_line(fd);
 // 	printf("%s", s);
-// 	free(s);
-// 	s = get_next_line(fd);
-// 	printf("%s", s);
-// 	free(s);
-// 	s = get_next_line(fd);
-// 	printf("%s", s);
-// 	free(s);
-// 	s = get_next_line(fd);
-// 	printf("%s", s);
-// 	free(s);
-// 	s = get_next_line(fd);
-// 	printf("%s", s);
-// 	free(s);
+// 	free(s); */
 // 	close(fd);
 // }
