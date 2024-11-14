@@ -80,21 +80,6 @@ char	*ft_strndup(char *s, size_t n)
 	return (str);
 }
 
-char	*ft_roll_left(char **s, size_t i)
-{
-	char			*ret;
-	size_t const	sz = ft_strlen(*s);
-	char			*s2;
-
-	ret = ft_strndup(*s, i);
-	s2 = ft_strndup(&(*s[i + 1]), sz);
-	if (!s2)
-		s2 = 0;
-	free(*s);
-	*s = s2;
-	return (ret);
-}
-
 char	*ft_strjoin(char const *s1, char const *s2)
 {
 	size_t const	s1sz = ft_strlen(s1);
