@@ -6,92 +6,100 @@
 /*   By: tblochet <tblochet@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/09 11:58:24 by tblochet          #+#    #+#             */
-/*   Updated: 2024/11/13 20:32:05 by tblochet         ###   ########.fr       */
+/*   Updated: 2024/11/14 14:06:28 by tblochet         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 #include <stdio.h>
+#include <string.h>
 
-char	*ft_append(char *dst, char const *src)
-{
-	char	*dup;
-
-	dup = ft_strndup(dst, ft_strlen((const char *)dst));
-	free(dst);
-	dst = ft_strjoin(dup, src);
-	free(dup);
-	return (dst);
-}
-
-char	*ft_extract_line(t_buffer *buff)
-{
-	size_t	ix;
-	char	*dup;
-	char	*dup2;
-
-	ix = (size_t)ft_index_of(buff->s, '\n');
-	dup = ft_strndup(buff->s, ft_strlen(buff->s));
-	free(buff->s);
-	if (ix == ft_strlen(dup) - 1)
-	{
-		buff->s = ft_calloc(1, sizeof(char));
-		return (dup);
-	}
-	dup2 = ft_strndup(dup, ix);
-	buff->s = ft_strndup(dup + ix + 1, ft_strlen(dup) - ix + 1);
-	free(dup);
-	buff->empty = (buff->s[0] == 0);
-	return (dup2);
-}
-
-void	ft_populate_tmp(char *tmp)
+char	*ft_strdup(char *s, int offset)
 {
 	size_t	i;
+	char	*str;
 
+	if (!s)
+		return (0);
+	s += offset;
+	str = calloc((strlen(s) + 1), sizeof(char));
+	if (!str)
+		return (0);
 	i = 0;
-	while (i < BUFFER_SIZE + 1)
+	while (s[i])
 	{
-		tmp[i] = 0;
+		str[i] = s[i];
 		i++;
 	}
+	free(s - offset);
+	return (str);
 }
 
-char	*ft_return_end_empty_buffer(char **buffer)
+char	*ft_strjoin2(char *s1, char *s2)
 {
-	char	*dup;
+	size_t s1sz;
+	size_t sz; 
+	char			*s;
+	size_t			i;
+
+	if (!s1)
+		return (ft_strdup(s2, 0));
+	if (!s2)
+		return (ft_strdup(s1, 0));
+	s1sz = strlen(s1);
+	sz = s1sz + strlen(s2) + 1;
+	s = calloc(sz, sizeof(char));
+	if (!s)
+		return (0);
+	i = -1;
+	while (++i < s1sz)
+		s[i] = s1[i];
+	while (i < sz)
+	{
+		s[i] = s2[i - s1sz];
+		i++;
+	}
+	free(s1);
+	free(s2);
+	return (s);
+}
+
+char *get_next_line(int fd)
+{
+	char *buffer;
+	int sz;
+	char *line;
+	static char *save;
 	
-	if (*buffer == 0)
-		return (0);
-	dup = ft_strndup(*buffer, ft_strlen(*buffer));
-	free(*buffer);
-	*buffer = 0;
-	return (dup);
-}
-
-char	*get_next_line(int fd)
-{
-	static t_buffer	buff;
-	char			tmp[BUFFER_SIZE + 1];
-	ssize_t			rx;
-
-	ft_populate_tmp(tmp);
-	rx = read(fd, tmp, BUFFER_SIZE);
-	if (rx < 0)
-		return (0);
-	if (!buff.state)
+	buffer = calloc(BUFFER_SIZE + 1, sizeof(char));
+	sz = read(fd, buffer, BUFFER_SIZE);
+	while (sz > 0)
 	{
-		buff.state = 1;
-		buff.s = ft_calloc(BUFFER_SIZE + 1, sizeof(char));
+		save = ft_strjoin2(save, buffer);
+		for (int i = 0; i < (int)strlen(save); ++i)
+		{
+			if (save[i] == '\n')
+			{
+				line = calloc(i + 1, sizeof(char));
+				for (int j = 0; j < i + 1; ++j)
+					line[j] = save[j];
+				save = ft_strdup(save, i + 1);
+				return (line);
+			}
+		}
+		buffer = calloc(BUFFER_SIZE + 1, sizeof(char));
+		sz = read(fd, buffer, BUFFER_SIZE);
 	}
-	while (rx)
-	{
-		buff.s = ft_append(buff.s, tmp);
-		if (ft_index_of(buff.s, '\n') > -1)
-			return (ft_extract_line(&buff));
-		rx = read(fd, tmp, BUFFER_SIZE);
+
+	free(buffer);
+	if (save)
+	{	
+		buffer = ft_strdup(save, 0);
+		free(save);
+		save = 0;
+		return (buffer);
 	}
-	return (ft_return_end_empty_buffer(&buff.s));
+	return (0);
 }
 
 // int	main(int ac, char **av)
