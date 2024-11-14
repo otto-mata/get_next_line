@@ -11,122 +11,98 @@
 /* ************************************************************************** */
 
 #include "get_next_line.h"
-#include <stdio.h>
-#include <string.h>
 
-char	*ft_strdup(char *s, int offset)
+char	*ft_specialjoin(char *buffer, char *buf)
 {
-	size_t	i;
-	char	*str;
+	char	*temp;
 
-	if (!s)
-		return (0);
-	s += offset;
-	str = calloc((strlen(s) + 1), sizeof(char));
-	if (!str)
-		return (0);
-	i = 0;
-	while (s[i])
-	{
-		str[i] = s[i];
-		i++;
-	}
-	free(s - offset);
-	return (str);
-}
-
-char	*ft_strjoin2(char *s1, char *s2)
-{
-	size_t s1sz;
-	size_t sz; 
-	char			*s;
-	size_t			i;
-
-	if (!s1)
-		return (ft_strdup(s2, 0));
-	if (!s2)
-		return (ft_strdup(s1, 0));
-	s1sz = strlen(s1);
-	sz = s1sz + strlen(s2) + 1;
-	s = calloc(sz, sizeof(char));
-	if (!s)
-		return (0);
-	i = -1;
-	while (++i < s1sz)
-		s[i] = s1[i];
-	while (i < sz)
-	{
-		s[i] = s2[i - s1sz];
-		i++;
-	}
-	free(s1);
-	free(s2);
-	return (s);
-}
-
-char *get_next_line(int fd)
-{
-	char *buffer;
-	int sz;
-	char *line;
-	static char *save;
-	
-	buffer = calloc(BUFFER_SIZE + 1, sizeof(char));
-	sz = read(fd, buffer, BUFFER_SIZE);
-	while (sz > 0)
-	{
-		save = ft_strjoin2(save, buffer);
-		for (int i = 0; i < (int)strlen(save); ++i)
-		{
-			if (save[i] == '\n')
-			{
-				line = calloc(i + 1, sizeof(char));
-				for (int j = 0; j < i + 1; ++j)
-					line[j] = save[j];
-				save = ft_strdup(save, i + 1);
-				return (line);
-			}
-		}
-		buffer = calloc(BUFFER_SIZE + 1, sizeof(char));
-		sz = read(fd, buffer, BUFFER_SIZE);
-	}
-
+	temp = ft_strjoin(buffer, buf);
 	free(buffer);
-	if (save)
-	{	
-		buffer = ft_strdup(save, 0);
-		free(save);
-		save = 0;
-		return (buffer);
-	}
-	return (0);
+	return (temp);
 }
 
-// int	main(int ac, char **av)
-// {
-// 	int		fd;
-// 	char	*s;
+char	*ft_next(char *buffer)
+{
+	int		i;
+	int		j;
+	char	*line;
 
-// 	if (ac < 2)
-// 		return ((int)printf("No file provided.\n"));
-// 	fd = open(av[1], O_RDONLY);
-// 	s = get_next_line(fd);
-// 	printf("1. %s", s);
-// 	free(s);
-// 	s = get_next_line(fd);
-// 	printf("2. %s", s);
-// 	free(s);
-// 	s = get_next_line(fd);
-// 	printf("3. %s", s);
-// 	free(s);
-// 	s = get_next_line(fd);
-// 	printf("4. %s", s);
-// 	free(s);
-// 	/* s = get_next_line(fd);
-// 	printf("%s", s);
-// 	free(s);
-// 	s = get_next_line(fd);
-// 	printf("%s", s);
-// 	free(s); */
-// 	close(fd);
-// }
+	i = 0;
+	while (buffer[i] && buffer[i] != '\n')
+		i++;
+	if (!buffer[i])
+	{
+		free(buffer);
+		return (NULL);
+	}
+	line = ft_calloc((ft_strlen(buffer) - i + 1), sizeof(char));
+	i++;
+	j = 0;
+	while (buffer[i])
+		line[j++] = buffer[i++];
+	free(buffer);
+	return (line);
+}
+
+char	*ft_line(char *buffer)
+{
+	char	*line;
+	int		i;
+
+	i = 0;
+	if (!buffer[i])
+		return (NULL);
+	while (buffer[i] && buffer[i] != '\n')
+		i++;
+	line = ft_calloc(i + 2, sizeof(char));
+	i = 0;
+	while (buffer[i] && buffer[i] != '\n')
+	{
+		line[i] = buffer[i];
+		i++;
+	}
+	if (buffer[i] && buffer[i] == '\n')
+		line[i++] = '\n';
+	return (line);
+}
+
+char	*read_file(int fd, char *res)
+{
+	char	*buffer;
+	int		byte_read;
+
+	if (!res)
+		res = ft_calloc(1, 1);
+	buffer = ft_calloc(BUFFER_SIZE + 1, sizeof(char));
+	byte_read = 1;
+	while (byte_read > 0)
+	{
+		byte_read = read(fd, buffer, BUFFER_SIZE);
+		if (byte_read == -1)
+		{
+			free(buffer);
+			return (NULL);
+		}
+		buffer[byte_read] = 0;
+		res = ft_specialjoin(res, buffer);
+		if (ft_char_in_s(buffer, '\n') >= 0)
+			break ;
+	}
+	free(buffer);
+	return (res);
+}
+
+char	*get_next_line(int fd)
+{
+	static char	*buffer;
+	char		*line;
+
+	if (fd < 0 || BUFFER_SIZE <= 0 || read(fd, 0, 0) < 0)
+		return (NULL);
+	buffer = read_file(fd, buffer);
+	if (!buffer)
+		return (NULL);
+	line = ft_line(buffer);
+	buffer = ft_next(buffer);
+	return (line);
+}
