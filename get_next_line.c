@@ -85,7 +85,7 @@ char	*read_file(int fd, char *res)
 		}
 		buffer[byte_read] = 0;
 		res = ft_specialjoin(res, buffer);
-		if (ft_indexof(buffer, '\n') >= 0)
+		if (ft_index_of(buffer, '\n') >= 0)
 			break ;
 	}
 	free(buffer);
