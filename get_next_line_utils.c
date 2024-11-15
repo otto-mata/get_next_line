@@ -6,7 +6,7 @@
 /*   By: tblochet <tblochet@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/09 11:58:27 by tblochet          #+#    #+#             */
-/*   Updated: 2024/11/13 14:41:52 by tblochet         ###   ########.fr       */
+/*   Updated: 2024/11/15 08:33:06 by tblochet         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,25 +59,6 @@ size_t	ft_strlen(char const *s)
 	while (s[i])
 		i++;
 	return (i);
-}
-
-char	*ft_strndup(char *s, size_t n)
-{
-	size_t	i;
-	char	*str;
-
-	if (!s)
-		return (0);
-	str = ft_calloc((ft_strlen(s) + 1), sizeof(char));
-	if (!str)
-		return (0);
-	i = 0;
-	while (s[i] && i < n + 1)
-	{
-		str[i] = s[i];
-		i++;
-	}
-	return (str);
 }
 
 char	*ft_strjoin(char const *s1, char const *s2)

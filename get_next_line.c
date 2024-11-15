@@ -6,7 +6,7 @@
 /*   By: tblochet <tblochet@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/09 11:58:24 by tblochet          #+#    #+#             */
-/*   Updated: 2024/11/14 14:06:28 by tblochet         ###   ########.fr       */
+/*   Updated: 2024/11/15 09:02:44 by tblochet         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,3 +106,28 @@ char	*get_next_line(int fd)
 	buffer = ft_next(buffer);
 	return (line);
 }
+/*#include <stdio.h>
+int main(int argc, char const *argv[])
+{
+	int		fd;
+	int		lines;
+	char	*s;
+
+	if (argc < 2)
+	{
+		lines = 5;
+		fd = 0;
+	}
+	else
+		fd = open(argv[1], O_RDONLY);
+	if (argc == 3)
+		lines = atoi(argv[2]);
+	while (lines--)
+	{
+		s = get_next_line(fd);
+		printf("%s", s);
+		free(s);
+	}
+	return (0);
+}
+*/
