@@ -6,7 +6,7 @@
 /*   By: tblochet <tblochet@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/09 11:58:24 by tblochet          #+#    #+#             */
-/*   Updated: 2024/11/16 15:24:08 by tblochet         ###   ########.fr       */
+/*   Updated: 2024/11/19 17:04:35 by tblochet         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,7 +98,14 @@ char	*get_next_line(int fd)
 	char		*line;
 
 	if (fd < 0 || BUFFER_SIZE <= 0 || read(fd, 0, 0) < 0)
+	{
+		if (fd >= 0)
+		{
+			free(buffer[fd]);
+			buffer[fd] = 0;
+		}
 		return (NULL);
+	}
 	buffer[fd] = read_file(fd, buffer[fd]);
 	if (!buffer[fd])
 		return (NULL);
@@ -108,22 +115,33 @@ char	*get_next_line(int fd)
 }
 
 /* #include <stdio.h>
-int main(int argc, char const *argv[])
+int	main(int argc, char const *argv[])
 {
 	int		fd;
 	int		lines;
+	int		start_lines;
 	char	*s;
 
 	if (argc < 2)
 	{
-		lines = 5;
+		start_lines = 5;
 		fd = 0;
 	}
 	else
 		fd = open(argv[1], O_RDONLY);
 	if (argc == 3)
-		lines = atoi(argv[2]);
-	while (lines--)
+		start_lines = atoi(argv[2]);
+	lines = 0;
+	while (lines < start_lines / 2)
+	{
+		s = get_next_line(fd);
+		printf("%s", s);
+		free(s);
+		lines++;
+	}
+	close(fd);
+	fd = open(argv[1], O_RDONLY);
+	while (lines++ < start_lines)
 	{
 		s = get_next_line(fd);
 		printf("%s", s);

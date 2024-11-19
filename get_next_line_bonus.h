@@ -6,7 +6,7 @@
 /*   By: tblochet <tblochet@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/09 11:58:21 by tblochet          #+#    #+#             */
-/*   Updated: 2024/11/16 15:22:20 by tblochet         ###   ########.fr       */
+/*   Updated: 2024/11/19 17:01:28 by tblochet         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,10 +17,7 @@
 # include <sys/types.h>
 # include <sys/stat.h>
 # include <stdlib.h>
-# ifndef BUFFER_SIZE
-#  define BUFFER_SIZE 42
-# endif
-# define MAX_FD 1024
+# define MAX_FD 16384
 
 typedef struct s_buffer {
 	char	*s;
