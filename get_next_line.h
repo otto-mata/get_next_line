@@ -6,7 +6,7 @@
 /*   By: tblochet <tblochet@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/09 11:58:21 by tblochet          #+#    #+#             */
-/*   Updated: 2024/11/16 15:18:10 by tblochet         ###   ########.fr       */
+/*   Updated: 2024/11/28 11:00:35 by tblochet         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,5 @@ char	*get_next_line(int fd);
 ssize_t	ft_index_of(char const *s, char c);
 char	*ft_strjoin(char const *s1, char const *s2);
 size_t	ft_strlen(char const *s);
-char	*ft_roll_left(char **s, size_t i);
-char	*ft_strndup(char *s, size_t n);
 void	*ft_calloc(size_t nmemb, size_t sz);
 #endif
