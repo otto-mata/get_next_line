@@ -6,7 +6,7 @@
 /*   By: tblochet <tblochet@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/09 11:58:24 by tblochet          #+#    #+#             */
-/*   Updated: 2024/11/28 10:50:57 by tblochet         ###   ########.fr       */
+/*   Updated: 2024/12/07 14:41:09 by tblochet         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,12 +16,14 @@ char	*ft_specialjoin(char *buffer, char *buf)
 {
 	char	*temp;
 
+	if (!buffer)
+		return (0);
 	temp = ft_strjoin(buffer, buf);
 	free(buffer);
 	return (temp);
 }
 
-char	*ft_next(char *buffer)
+char	*next_line(char *buffer)
 {
 	int		i;
 	int		j;
@@ -33,9 +35,11 @@ char	*ft_next(char *buffer)
 	if (!buffer[i])
 	{
 		free(buffer);
-		return (NULL);
+		return (0);
 	}
 	line = ft_calloc((ft_strlen(buffer) - i + 1), sizeof(char));
+	if (!line)
+		return (0);
 	i++;
 	j = 0;
 	while (buffer[i])
@@ -44,25 +48,27 @@ char	*ft_next(char *buffer)
 	return (line);
 }
 
-char	*ft_line(char *buffer)
+char	*extact_line(char *buffer)
 {
 	char	*line;
 	int		i;
 
 	i = 0;
 	if (!buffer[i])
-		return (NULL);
+		return (0);
 	while (buffer[i] && buffer[i] != '\n')
 		i++;
-	line = ft_calloc(i + 2, sizeof(char));
+	line = ft_calloc(i + 1 + !!(buffer[i] == '\n'), sizeof(char));
+	if (!line)
+		return (0);
 	i = 0;
 	while (buffer[i] && buffer[i] != '\n')
 	{
 		line[i] = buffer[i];
 		i++;
 	}
-	if (buffer[i] && buffer[i] == '\n')
-		line[i++] = '\n';
+	if (buffer[i] == '\n')
+		line[i] = '\n';
 	return (line);
 }
 
@@ -74,6 +80,8 @@ char	*read_file(int fd, char *res)
 	if (!res)
 		res = ft_calloc(1, 1);
 	buffer = ft_calloc(BUFFER_SIZE + 1, sizeof(char));
+	if (!buffer)
+		return (0);
 	byte_read = 1;
 	while (byte_read > 0)
 	{
@@ -81,7 +89,7 @@ char	*read_file(int fd, char *res)
 		if (byte_read == -1)
 		{
 			free(buffer);
-			return (NULL);
+			return (0);
 		}
 		buffer[byte_read] = 0;
 		res = ft_specialjoin(res, buffer);
@@ -101,37 +109,39 @@ char	*get_next_line(int fd)
 	{
 		free(buffer);
 		buffer = 0;
-		return (NULL);
+		return (0);
 	}
 	buffer = read_file(fd, buffer);
 	if (!buffer)
-		return (NULL);
-	line = ft_line(buffer);
-	buffer = ft_next(buffer);
+		return (0);
+	line = extact_line(buffer);
+	buffer = next_line(buffer);
 	return (line);
 }
-/*#include <stdio.h>
-int main(int argc, char const *argv[])
+/* #include <stdio.h>
+int	main(int argc, char const *argv[])
 {
 	int		fd;
 	int		lines;
+	int		start_lines;
 	char	*s;
 
 	if (argc < 2)
-	{
-		lines = 5;
 		fd = 0;
-	}
 	else
 		fd = open(argv[1], O_RDONLY);
 	if (argc == 3)
-		lines = atoi(argv[2]);
-	while (lines--)
+		start_lines = atoi(argv[2]);
+	else
+		start_lines = 5;
+	lines = 0;
+	while (lines < start_lines)
 	{
 		s = get_next_line(fd);
 		printf("%s", s);
 		free(s);
+		lines++;
 	}
 	return (0);
 }
-*/
+ */
