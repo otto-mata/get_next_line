@@ -6,24 +6,24 @@
 /*   By: tblochet <tblochet@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/09 11:58:24 by tblochet          #+#    #+#             */
-/*   Updated: 2024/12/07 14:41:09 by tblochet         ###   ########.fr       */
+/*   Updated: 2024/12/09 12:55:05 by tblochet         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-char	*ft_specialjoin(char *buffer, char *buf)
+char	*ft_join_and_free_s1(char *s1, char *s2)
 {
 	char	*temp;
 
-	if (!buffer)
+	if (!s1)
 		return (0);
-	temp = ft_strjoin(buffer, buf);
-	free(buffer);
+	temp = ft_strjoin(s1, s2);
+	free(s1);
 	return (temp);
 }
 
-char	*next_line(char *buffer)
+char	*shift_left(char *buffer)
 {
 	int		i;
 	int		j;
@@ -48,7 +48,7 @@ char	*next_line(char *buffer)
 	return (line);
 }
 
-char	*extact_line(char *buffer)
+char	*extract_line_from(char *buffer)
 {
 	char	*line;
 	int		i;
@@ -72,7 +72,7 @@ char	*extact_line(char *buffer)
 	return (line);
 }
 
-char	*read_file(int fd, char *res)
+char	*read_from_fd(int fd, char *res)
 {
 	char	*buffer;
 	int		byte_read;
@@ -92,7 +92,7 @@ char	*read_file(int fd, char *res)
 			return (0);
 		}
 		buffer[byte_read] = 0;
-		res = ft_specialjoin(res, buffer);
+		res = ft_join_and_free_s1(res, buffer);
 		if (ft_index_of(buffer, '\n') >= 0)
 			break ;
 	}
@@ -111,11 +111,11 @@ char	*get_next_line(int fd)
 		buffer = 0;
 		return (0);
 	}
-	buffer = read_file(fd, buffer);
+	buffer = read_from_fd(fd, buffer);
 	if (!buffer)
 		return (0);
-	line = extact_line(buffer);
-	buffer = next_line(buffer);
+	line = extract_line_from(buffer);
+	buffer = shift_left(buffer);
 	return (line);
 }
 /* #include <stdio.h>
